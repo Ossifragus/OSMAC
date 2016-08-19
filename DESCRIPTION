@@ -2,7 +2,7 @@ Package: OSMAC
 Title: Optimal Subsampling for Logistic Regression
 Version: 0.0.0.9000
 Authors@R: person("HaiYing", "Wang", email = "whygps@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: This package implements the Optimal Subsampling procedure Motivated from the A-optimality Criterion.
 Depends:
     R (>= 3.3.1)
 License: What license is it under?
