@@ -1,0 +1,11 @@
+Package: OSMAC
+Title: What the Package Does (one line, title case)
+Version: 0.0.0.9000
+Authors@R: person("HaiYing", "Wang", email = "whygps@gmail.com", role = c("aut", "cre"))
+Description: This package implement the optimal subsampling procedure for logistic regression.
+Depends:
+    R (>= 3.3.1)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1.9000

@@ -1,0 +1,124 @@
+rm(list=ls())
+ini.time <- Sys.time()
+source("getMLE.r")
+source("twostep.r")
+
+dat1 <- read.csv("adult-data.csv")
+dat2 <- read.csv("adult-test.csv")
+dat <- dat1## rbind(dat1, dat2)
+## datall <- read.csv("adult-all.csv")
+X <- as.matrix(dat[,c(1,3,5,11:13)])
+X <- t(t(X) / apply(X, 2, sd))
+X <- X[,c(1:3,5:6)]
+X <- cbind(1, X)
+Y <- as.numeric(dat[,15]) - 1
+n <- dim(X)[1]
+d <- dim(X)[2]
+beta0 <- getMLE(X, Y, 1)$par
+print(beta0)
+
+beta.full <- beta0
+P.full  <- 1 - 1 / (1 + exp(c(X %*% beta.full)))
+w.full <- P.full * (1 - P.full)
+W.full <- solve(t(X) %*% (X * w.full))
+se.full <- sqrt(diag(W.full))
+print(round(se.full, 3))
+##
+
+rpt <- 1000
+r1 <- 200
+r <- 200
+
+## r1.ss <- round(seq(100, r, length=20))
+r.ss <- c(100, 200, 300, 500, 700, 1000)## [6]
+lrs <- length(r.ss)
+Beta.simp <- matrix(NA, d, rpt*lrs)
+nm <- 2
+Beta.opt <- matrix(NA, d*nm, rpt*lrs)
+itr <- 0
+SE.simp <- matrix(NA, d, rpt*lrs)
+SE.opt <- matrix(NA, d*nm, rpt*lrs)
+
+for (r in r.ss) {
+cat(r, " ");
+set.seed(10)
+for (rr in 1:rpt) {
+    if (rr%/%100 == rr/100) cat(rr, "-")
+    itr <- itr+1
+    fit.alg.simp <- AlgTwoStp(r1+r, 0)
+    Beta.simp[,itr] <- fit.alg.simp$simp
+    SE.simp[,itr] <- fit.alg.simp$amse
+    if (any(fit.alg.simp$msg != "Successful convergence")) {
+        warning(paste(rr, "not converge", fit.alg.simp$msg))
+        Beta.simp[,itr] <- NA
+    }
+    fit.alg <- AlgTwoStp(r1, r)
+    if (any(fit.alg$msg != "Successful convergence")) {
+        warning(paste(rr, "not converge:", fit.alg$msg))
+        next
+    }
+    Beta.opt[,itr] <- c(fit.alg$opt)
+    SE.opt[,itr] <- c(fit.alg$amse)
+}
+cat("\n")
+}
+
+print(Sys.time() - ini.time)
+
+l2.simp <- (Beta.simp - beta0)^2
+l2.opt  <- (Beta.opt  - beta0)^2
+mse.simp <- mse.opt <- c()
+for (i in 1:lrs) {
+    loc <- ((i-1)*rpt+1):(i*rpt)
+    mse.simp <- c(mse.simp, sum(rowMeans(l2.simp[,loc], na.rm=TRUE)))
+    mse.opt <- rbind(mse.opt, colSums(matrix(
+        rowMeans(l2.opt[,loc], na.rm=TRUE), d, nm)))
+}
+
+rec <- cbind(mse.simp, mse.opt)
+
+plot(r.ss, rec[,1]/rec[,1], xlab="", ylab="", pch="1",
+     ylim=c(min(rec/rec[,1]), max(rec/rec[,1])), type="o")
+pp <- dim(rec)[2]
+for(i in 2:pp)
+    lines(r.ss, rec[,i]/rec[,1], type="o", pch=paste(i), lty=i, col=i)
+legend("center", lty=1:pp, pch=paste(1:pp), col=1:pp,
+       legend=c("uniform", "MV", "MVC"))
+       ## legend=c("uniform", "MV", "MEV", "MVC", "MEVC", "Li", "L0"))
+
+print(rec)
+print(sum(rec))
+
+dat <- dat2## rbind(dat1, dat2)
+## datall <- read.csv("adult-all.csv")
+X <- as.matrix(dat[,c(1,3,5,11:13)])
+X <- t(t(X) / apply(X, 2, sd))
+X <- X[,c(1:3,5:6)]
+X <- cbind(1, X)
+Y <- as.numeric(dat[,15]) - 1
+n <- dim(X)[1]
+d <- dim(X)[2]
+
+pred.simp <- c()
+res.simp <- abs(Y - (X%*%Beta.simp > 0))
+for (i in 1:lrs) {
+    loc <- ((i-1)*rpt+1):(i*rpt)
+    pred.simp <- c(pred.simp, mean(res.simp[,loc], na.rm=TRUE))
+}
+pred.opt <- matrix(NA, lrs, nm)
+for(j in 1:nm) {
+    locj <- ((j-1)*d+1):(j*d)
+    res.opt <- abs(Y - (X%*%Beta.opt[locj,] > 0))
+    for (i in 1:lrs) {
+        loci <- ((i-1)*rpt+1):(i*rpt)
+        pred.opt[i,j] <- mean(res.opt[,loci], na.rm=TRUE)
+    }
+}
+rm(list=c("res.simp", "res.opt"))
+pred.true <- 1 - mean(abs(Y - (X%*%beta0 > 0)))
+rec.pred <- (1- cbind(pred.simp, pred.opt)) / pred.true
+print(rec.pred)
+print(pred.true)
+
+save.image(file=paste("output/mse2.Rdata"))
+print(Sys.time() - ini.time)
