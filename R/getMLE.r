@@ -1,6 +1,12 @@
-## This function calculate the weighted MLE for the input covariate matrix x, response vector y, and weight vector w.
-## This function returns a list with three elements: par, the weighted MLE; msg, the fitting message; iter, the number of itterations used. 
-
+#'This function calculate the weighted MLE for the input 
+#'   covariate matrix x, 
+#'   response vector y, 
+#'   and weight vector w.
+#'This function returns a list with three elements: 
+#'   par, the weighted MLE; 
+#'   msg, the fitting message; 
+#'   iter, the number of itterations used. 
+#'
 getMLE <- function(x, y, w) {
     beta <- rep(0, d)
     loop  <- 1
