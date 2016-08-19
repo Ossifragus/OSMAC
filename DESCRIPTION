@@ -1,7 +1,7 @@
 Package: OSMAC
-Title: What the Package Does (one line, title case)
+Title: Optimal Subsampling for Logistic Regression
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Authors@R: person("HaiYing", "Wang", email = "whygps@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends:
     R (>= 3.3.1)

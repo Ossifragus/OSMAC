@@ -1,15 +1,26 @@
-#'This function implement the OSMAC method for the input
-#'  covariate matrix X, 
-#'  response vector Y, 
-#'  first step sample size r1, 
-#'  the second step sample size r2, 
-#'  and the method to use.
-#'This function returns a list with three elements: 
-#'    par, the weighted MLE; 
-#'    amse, the standard errors; 
-#'    msg, the fitting message; 
-#'    iter, the number of itterations used; method, the method used.
+#' The twostep algorithm
 #'
+#'This function implement the OSMAC method for the input covariate matrix @param X, response vector Y, first step sample size r1, the second step sample size r2, and the method to use.
+#'It returns a list with three elements: par, the weighted MLE; amse, the standard errors; msg, the fitting message; iter, the number of itterations used; method, the method used.
+
+#' @param X the input covariate matrix
+#' @param Y the input response vector
+#' @param r1 the first step sample size
+#' @param r2 the second step sample size
+#' @param method the method to use
+#' @keywords getMLE twostep
+#' @export
+#' @examples
+#' dat <- adult.train
+#' X <- as.matrix(dat[,c(1,3,5,12:13)])
+#' X <- t(t(X) / apply(X, 2, sd))
+#' X <- cbind(1, X)
+#' Y <- as.numeric(dat[,15]) - 1
+#' n <- dim(X)[1]
+#' d <- dim(X)[2]
+#' twostep(X, Y, 200, 800, "mmse")
+
+
 twostep <- function(X, Y, r1, r2, method=c("mvc", "mmse", "uni")) {
     call <- match.call()
     method <- match.arg(method)
