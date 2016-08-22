@@ -15,22 +15,10 @@
 #' X <- t(t(X) / apply(X, 2, sd))
 #' X <- cbind(1, X)
 #' Y <- as.numeric(dat[,15]) - 1
-#' n <- dim(X)[1]
-#' d <- dim(X)[2]
 #' getMLE(X, Y, 1)
-#' $par
-#'                           Age         Fnlwgt  Education.num   Loss.captial
-#'     -8.6366072      0.6374174      0.0648296      0.8780786      0.2342951
-#' Hours.per.week
-#'      0.5249214
-#'
-#' $message
-#' [1] "Successful convergence"
-#'
-#' $iter
-#' [1] 5
 
 getMLE <- function(x, y, w) {
+    d <- ncol(x)
     beta <- rep(0, d)
     loop  <- 1
     Loop  <- 100

@@ -17,31 +17,13 @@
 #' X <- t(t(X) / apply(X, 2, sd))
 #' X <- cbind(1, X)
 #' Y <- as.numeric(dat[,15]) - 1
-#' n <- dim(X)[1]
-#' d <- dim(X)[2]
 #' set.seed(0)
 #' twostep(X, Y, 200, 800, "mmse")
-#' $par
-#'                           Age         Fnlwgt  Education.num   Loss.captial
-#'   -8.689583146    0.674382884    0.007324013    0.904201295    0.181672976
-#' Hours.per.week
-#'    0.530470442
-#'
-#' $amse
-#'                           Age         Fnlwgt  Education.num   Loss.captial
-#'     0.48642065     0.08219055     0.08173754     0.08831323     0.06255226
-#' Hours.per.week
-#'     0.07532755
-#'
-#' $msg
-#' [1] "Successful convergence" "Successful convergence"
-#'
-#' $method
-#' [1] "mmse"
 
 twostep <- function(X, Y, r1, r2, method=c("mvc", "mmse", "uni")) {
     call <- match.call()
     method <- match.arg(method)
+    n <- length(Y)
     if (method == "uni") {
         idx.simp <- sample(1:n, r1, T)
         x.simp <- X[idx.simp,]
