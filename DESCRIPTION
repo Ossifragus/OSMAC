@@ -9,3 +9,4 @@ Depends:
     R (>= 3.3.1)
 License: GPL
 Encoding: UTF-8
+LazyData: true
